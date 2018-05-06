@@ -9,17 +9,16 @@ const mimeTypes = {
 	jpg: 'image/jpg',
 	png: 'image/png',
 	js: 'text/javascript',
-	css: 'text/css',
-  map: 'text/plain'
+	css: 'text/css'
 };
-const host = process.env.YOUR_HOST || '0.0.0.0';
-const port = process.env.PORT || 8080;
+const host = process.env.HOST || '127.0.0.1';
+const port = process.env.PORT || 3000;
 
 createServer((req, res) => {
+  let stats;
 	const uri = parse(req.url).pathname;
 	const fileName = join(process.cwd(), decodeURI(uri));
 	console.log('Loading '+ uri);
-	let stats;
 
 	try{
 		stats = lstatSync(fileName);
@@ -31,8 +30,7 @@ createServer((req, res) => {
 	}
 
 	if(stats.isFile()){
-		const mimeType = mimeTypes[extname(fileName).split('.').reverse()[0]];
-		console.log(mimeType);
+		const mimeType = mimeTypes[extname(fileName).split('.').reverse()[0]] || 'text/plain';
 		res.writeHead(200, { 'Content-type': mimeType });
 
 		const fileStream = createReadStream(fileName);
@@ -46,5 +44,5 @@ createServer((req, res) => {
 		res.end();
 	}
 }).listen(port, host, () => {
-    console.info(`App listening on port ${port}!`);
+    console.info(`App listening on ${host}:${port}!`);
 });
